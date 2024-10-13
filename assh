@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+XT=${XH:-~/.assh*/}
+XH=${XH:=~/.assh.d}
+a="" h="" r=""
+shc () {
+[[ "$sf" == /tmp/* ]] && rm "$sf"
+[[ "$sd" == /tmp/* ]] && { rmdir "$sd" 2>/dev/null || echo "[assh] $sd contains data"; } || :
+ec=$(find /tmp -type d -name 'assh-*' -empty 2>/dev/null | wc -l)
+nc=$(find /tmp -type d -name 'assh-*' ! -empty 2>/dev/null | wc -l)
+(( nc > 0 || ec > 20 )) && echo "[assh] /tmp/assh-* dirs: $nc with data, $ec empty";}
+shd () {
+sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
+printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
+rsync --daemon --no-detach --config="$sf" &
+}
+assh() {
+command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
+[ ! -f "$XH/.asshrc" ] && echo "[assh] missing file: $XH/.asshrc" >&2 && exit 1
+te="--exclude={.git,LICENSE}";tx=$(eval echo $te)
+tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
+#echo $(tar $tp|tar -tzf -)
+z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
+trap shc 0
+XK=$(openssl rand -hex 32)
+XI=$(openssl rand -hex 16)
+XK=$(ssh -q -t "$h" "cat /etc/machine-id | openssl dgst -sha256 -hex -r | cut -d ' ' -f1" | cut -c1-64)
+o="openssl enc -aes-256-cbc -a -K $XK -iv $XI"
+od="openssl enc -aes-256-cbc -a -K \$XK -iv \$XI -d"
+unset XK
+read -r -d '' s <<EOB
+export XV="$XV"
+export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
+export PATH=\$XH:\$XH/bin:\$PATH
+export XK=$XK;export XI=$XI;export XZ=$z
+export XK=\$(cat /etc/machine-id | openssl dgst -sha256 -hex -r | cut -d ' ' -f1 | cut -c1-64)
+${XP:+export XP=$XP}
+echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
+[ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
+[ -z "$r" ] && [ ! -e \$XH/.hushassh ] && \$XH/bin/,motd
+echo "$r" >> \$XH/.asshrc
+unset XK XI
+bash -c $'trap "[[ \$XH == /tmp/ssh+* ]] && rm -rf \$XH;" EXIT; bash --rcfile \$XH/.asshrc'
+EOB
+#echo "h:$h";echo $a;echo "s:$s"
+ssh -t "$h" $a "$s";}
+hR() {
+if [[ -z $1 || $1 == -* || ! $1 =~ ^[0-9]+:[^:]+:[0-9]+$ ]]; then
+XP=${XP:-$(shuf -i 50000-65000 -n 1)}
+a+=" -R $XP:localhost:$XP";shd
+else a+=" -R $1";return 1;fi;}
+arg() {
+while [[ $# -gt 0 ]]; do
+case $1 in
+-V) echo "$XV, $(ssh -V 2>&1)"; exit 0 ;;
+-R) hR "$2";shift $?;;
+-[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;
+-*) [[ $1 == "-R" ]]&&{ hR "$2";shift $?;}||a+=" $1";;
+ *) [[ -z $h ]]&&h=$1||{ r="${*};exit"; break;} ;;
+esac;shift;done
+[[ $h ]]||{ ssh $a;exit $?;}
+return 0;};arg "$@" && assh

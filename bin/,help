@@ -1,0 +1,58 @@
+#!/bin/bash
+
+. ${XH:=~/.assh.d}/lib/colors
+
+XB=$XH/bin
+
+# Find the length of the longest script name
+max_length=0
+for script in "$XB/"*; do
+    script_name=$(basename "$script")
+    if (( ${#script_name} > max_length )); then
+        max_length=${#script_name}
+    fi
+done
+
+# Alias file path (update with your actual alias file)
+ALIAS_FILE=$XH/.asshrc
+
+# Find the length of the longest alias name
+#max_length=0
+
+# Loop through the alias file to determine max alias name length and store aliases with help
+declare -A alias_help
+while IFS= read -r line; do
+    # Check if the line is a HELP line or an alias definition
+    if [[ $line == '# HELP:'* ]]; then
+        help_text="${line#\# HELP: }"
+    elif [[ $line == alias* ]]; then
+        alias_name=$(echo "$line" | cut -d'=' -f1 | awk '{print $2}')
+	alias_help["$alias_name"]="${help_text:-???}"
+        help_text=""
+        if (( ${#alias_name} > max_length )); then
+            max_length=${#alias_name}
+        fi
+    fi
+done < "$ALIAS_FILE"
+
+# Print help for each alias
+printf "${CD}# --- aliases${CN}\n"
+for alias_name in "${!alias_help[@]}"; do
+    if [[ "${alias_help[$alias_name]}" == "???" ]]; then
+	    printf "${CG}%-${max_length}s  ${CR}%s${CN}\n" "$alias_name" "${alias_help[$alias_name]}"
+    else
+	    printf "${CG}%-${max_length}s  ${CC}%s${CN}\n" "$alias_name" "${alias_help[$alias_name]}"
+    fi
+done
+
+# Print help for scripts
+printf "${CD}# --- scripts${CN}\n"
+for script in "$XB/"*; do
+    help_line=$(grep -m 1 '^# HELP:' "$script")
+    if [[ -n "$help_line" ]]; then
+        script_name=$(basename "$script")
+        help_text="${help_line#\# HELP: }"
+        printf "${CG}%-${max_length}s  ${CC}%s${CN}\n" "$script_name" "$help_text"
+    fi
+done
+

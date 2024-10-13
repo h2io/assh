@@ -1,0 +1,174 @@
+#!/bin/bash
+# HELP: enhanced message of the day with virtualization detection
+
+. ${XH:=~/.assh.d}/lib/colors
+
+# Function to detect virtualization
+detect_virtualization() {
+    local virtualization="bare metal"
+    local provider="Unknown"
+
+    # Method 1: Check CPU info for hypervisor flag
+    if grep -q hypervisor /proc/cpuinfo 2>/dev/null; then
+        virtualization="virtualized"
+    fi
+
+    # Method 2: Check for common virtualization modules
+    if command -v lsmod &>/dev/null; then
+        if lsmod | grep -q kvm; then
+            if grep -qE 'QEMU|KVM' /proc/1/environ 2>/dev/null; then
+                virtualization="virtualized"
+                provider="KVM/QEMU"
+            fi
+        fi
+    fi
+
+    # Method 3: Check lscpu for hypervisor vendor
+    if command -v lscpu &>/dev/null; then
+        if lscpu | grep -i hypervisor &>/dev/null; then
+            hypervisor_vendor=$(lscpu | grep -i 'Hypervisor vendor' | awk -F: '{print $2}' | xargs)
+            virtualization="virtualized"
+            provider="$hypervisor_vendor"
+        fi
+    fi
+
+    # Method 4: Check specific files or directories
+    if [ -f /sys/class/dmi/id/product_name ]; then
+        product_name=$(cat /sys/class/dmi/id/product_name)
+        if [[ $product_name =~ VMware ]]; then
+            virtualization="virtualized"
+            provider="VMware"
+        elif [[ $product_name =~ VirtualBox ]]; then
+            virtualization="virtualized"
+            provider="VirtualBox"
+        elif [[ $product_name =~ Xen ]]; then
+            virtualization="virtualized"
+            provider="Xen"
+        elif [[ $product_name =~ Google ]]; then
+            virtualization="virtualized"
+            provider="Google Cloud Platform"
+        fi
+    fi
+
+    # Method 5: Check with systemd-detect-virt
+    if command -v systemd-detect-virt &>/dev/null; then
+        virt=$(systemd-detect-virt 2>/dev/null)
+        if [ "$virt" != "none" ]; then
+            virtualization="virtualized"
+            provider="$virt"
+        fi
+    fi
+
+    # Check for specific cloud providers
+    if [ -f /sys/hypervisor/uuid ] && grep -q '^ec2' /sys/hypervisor/uuid; then
+        provider="Amazon AWS"
+    elif [ -d /var/lib/waagent ]; then
+        provider="Microsoft Azure"
+    elif [ -f /etc/oracle-cloud-agent ]; then
+        provider="Oracle Cloud"
+    fi
+
+    # Final result
+    if [ "$virtualization" = "bare metal" ]; then
+        echo -e "${CB}Virtualization:${RS} ${CG}None detected (running on bare metal)${RS}"
+    else
+        echo -e "${CB}Virtualization:${RS} ${CR}Detected (running inside a virtualized environment)${RS}"
+        echo -e "${CB}Provider:${RS} ${CM}$provider${RS}"
+    fi
+}
+
+# Function to get IP address (prefers non-localhost IP)
+get_ip_address() {
+    ip_address=$(hostname -I | awk '{print $1}')
+    if [ -z "$ip_address" ] || [ "$ip_address" = "127.0.0.1" ]; then
+        ip_address=$(ip route get 1 | awk '{print $7;exit}')
+    fi
+    echo "$ip_address"
+}
+
+# Function to check sudo privileges without password prompt
+check_sudo_privileges() {
+    if command -v sudo >/dev/null 2>&1; then
+        if sudo -n true 2>/dev/null; then
+            echo -e "${CYb}Yes${RS}"
+        else
+            echo -e "${CY}Limited/No${RS}"
+        fi
+    else
+        echo -e "${CR}Not available${RS}"
+    fi
+}
+
+# # Function to get Docker information
+get_docker_info() {
+    local docker_cmd="docker"
+    local sudo_docker_cmd="sudo -n docker"
+    local info=""
+
+    # Try without sudo first
+    if $docker_cmd info &>/dev/null; then
+        info=$($docker_cmd info --format '{{.Containers}} {{.ContainersRunning}} {{.ContainersStopped}} {{.Images}}')
+    # If that fails, try with sudo (non-interactive)
+    elif $sudo_docker_cmd info &>/dev/null; then
+        info=$($sudo_docker_cmd info --format '{{.Containers}} {{.ContainersRunning}} {{.ContainersStopped}} {{.Images}}')
+    fi
+
+    if [ -n "$info" ]; then
+        read total running stopped images <<< $info
+        echo -e "${CG}Total Docker Containers:${RS} $total,  Running: $running, Stopped: $stopped, Images: $images"
+    else
+        echo -e "${CY}Docker info not available${RS}"
+    fi
+}
+
+# Display system information
+echo -e "${CC}Welcome to $(hostname)${RS}\t${CD}[$XV]${CN}"
+echo -e "${CD}--------------------------------${RS}"
+printf "${CG}%-20s${RS} %s\n" "Date and Time:" "$(date)"
+printf "${CG}%-20s${RS} %s\n" "Uptime:" "$(uptime -p)"
+printf "${CG}%-20s${RS} %s\n" "System Load:" "$(uptime | awk -F'load average: ' '{ print $2 }')"
+printf "${CG}%-20s${RS} %s\n" "Memory Usage:" "$(free -h | grep Mem | awk '{print $3 " / " $2}')"
+printf "${CG}%-20s${RS} %s\n" "Disk Usage:" "$(df -h / | grep / | awk '{ print $3 " / " $2 }')"
+printf "${CG}%-20s${RS} %s\n" "IP Address:" "$(get_ip_address)"
+printf "${CG}%-20s${RS} %s\n" "Sudo Access:" "$(check_sudo_privileges)"
+echo -e "${CD}--------------------------------${RS}"
+get_docker_info
+echo -e "${CD}--------------------------------${RS}"
+
+# Display last login information with improved formatting
+echo -e "${CL}USERNAME         TTY      FROM             LOGIN TIME${RS}"
+last -a -d -n 5 | grep -v "reboot" | while read -r user tty from rest; do
+    printf "${CW}%-16s %-8s %-17s %s${RS}\n" "$user" "$tty" "$from" "$rest"
+done
+
+echo -e "\n${CG}Current Sessions:${RS}"
+who | while read -r user tty logintime ip; do
+    printf "${CW}%-16s %-8s %-17s %s${RS}\n" "$user" "$tty" "$ip" "$logintime"
+done
+
+echo -e "${CD}--------------------------------${RS}"
+
+# Call the virtualization detection function
+detect_virtualization
+echo -e "${CD}--------------------------------${RS}"
+
+# Display important system messages or alerts (if any)
+if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+    # User has sudo privileges and can use them without a password
+    echo -e "${CR}Recent System Alerts:${RS}"
+    sudo grep -i -E 'error|warning|critical' /var/log/syslog | tail -n 5
+    echo -e "${CD}--------------------------------${RS}"
+else
+    # User doesn't have sudo privileges or requires a password
+    echo -e "${CY}Note: Unable to check system alerts (requires sudo privileges)${RS}"
+    echo -e "${CD}--------------------------------${RS}"
+fi
+
+# Display available updates (if any)
+if command -v apt &>/dev/null; then
+    updates=$(apt list --upgradable 2>/dev/null | grep -c upgradable)
+    if [ "$updates" -gt 0 ]; then
+        echo -e "${CD}$updates package updates available${RS}"
+        echo -e "${CD}--------------------------------${RS}"
+    fi
+fi

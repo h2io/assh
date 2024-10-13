@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# prevent loops
+[ "$ASSHRC" ] && return || export ASSHRC=true
+export XV="h2.io/ASSH v1.02-21w20-4a7728bf"
+
+# HELP: grep history
+alias ,hg='history|grep'
+
+# HELP: ls ordered, human readable
+alias ,ls='ls --human-readable --size -1 -S -F'
+
+if [ "$XH" ]; then
+	# executed via assh login
+	[ -r /etc/profile ] && . /etc/profile
+	[ -r ~/.bash_profile ] && . ~/.bash_profile ||
+	[ -r ~/.bash_login ] && . ~/.bash_login ||
+	[ -r ~/.profile ] && . ~/.profile
+
+	for file in $XH/lib/*; do
+	    [[ -r "$file" ]] && . "$file"
+	done
+fi
+if [ "$LH" ]; then
+	# executed when sourced localy from .bashrc
+	for dir in $(ls -d ~/.assh*/bin 2>/dev/null | sort); do
+		[[ -d "$dir" ]] && PATH="$dir:$PATH"
+	done
+	export PATH=$LH:$PATH
+
+	for file in $LH/lib/*; do
+	    [[ -r "$file" ]] && . "$file"
+	done
+fi
+

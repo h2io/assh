@@ -1,0 +1,15 @@
+#!/bin/bash
+# HELP: ,get path rsyncs the path from this machine to the original assh machine
+
+# Ensure the source directory argument is provided (required)
+if [[ -z $1 ]]; then
+    echo "Usage: $(basename $0) path"
+    exit 1
+fi
+
+sd=$1;dd=assh
+port=${3:-$XP}
+
+command="rsync -a --port=$port $sd rsync://localhost/$dd"
+echo "[assh] executed $command"
+eval $command

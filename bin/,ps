@@ -1,0 +1,11 @@
+#!/bin/bash
+# HELP: list processes for a specific user in tree format
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/colors"
+
+sort_option="pid"
+ps -eo pid,ppid,user,etime,%cpu,cmd --forest --sort="$sort_option"
+
+# Show usage example as the last line:
+echo -e "${CY}Usage:${CW} ./,proc [%pid | %mem | pid | ppid | -etime]"
+
