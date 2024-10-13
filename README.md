@@ -28,34 +28,34 @@ ASSH behaves just like SSH but with added convenience and functionality:
 
 - **Standard Connection**  
   Connect to a server as you would with SSH:  
-  assh user@host
+  `assh user@host`
 
 - **Cascading Connections**  
   Once connected, you can use ASSH from the server to connect to another server:  
-  assh user@host2
+  `assh user@host2`
 
 - **Quick Access to Commands**  
   Any executable scripts in the `bin` subdirectory are automatically available.
-  I use filenames prefixed by `,` for easy lookup with ,<tab><tab>
+  I use filenames prefixed by `,` for easy lookup with `,<tab><tab>`
 
-    ,help
+    `,help`
 
 - **Reverse Port Forwarding with Copying**  
-  Using assh -R host sets up reverse port forwarding, enabling you to copy
+  Using `assh -R host` sets up reverse port forwarding, enabling you to copy
   files directly from the connected servers. You only use -R when you first
   start assh and the ,copy command will be available from all hosts.
 
-    ,copy <path>
+    `,copy <path>`
 
 - **No login messages**  
   By default, you get no motd messages. This behavior is controlled by the
-  .hushlogin and .hushassh files. Removing these files will show you the
+  `.hushlogin` and `.hushassh` files. Removing these files will show you the
   default login messages or a customized version.
 
   This is very useful in an enterprise setting where you have various servers
   that give you information you can't really use for anything.
 
-  The customized version you get by deleting .hushassh allows you to better see
+  The customized version you get by deleting `.hushassh` allows you to better see
   the server's status and to also get a unified message that you can customize
   as you see fit.
 
@@ -63,15 +63,15 @@ ASSH behaves just like SSH but with added convenience and functionality:
   You can customize the .sshrc for generic usage, add custom functionality for
   each server you log in to, or for groups of servers.
 
-  ~/.assh.d is just the main directory... all ~/.assh* directories get loaded
+  `~/.assh.d` is just the main directory... all `~/.assh*` directories get loaded
   in alphabetical order and combined on the server you assh into. This way you
   can have group settings but can also customize your own, overwriting with
   custom functionality while also keeping
 
 - **100% compatibility, 100% code is bash**  
   All code is bash so it can execute without problems on any server. Other
-  dependencies are widely available: openssl, cut, cat, tr, sed Because the
-  code is bash you can review it and be sure it does what it says.
+  dependencies are widely available: openssl, cut, cat, tr, sed, ...
+  Because the code is bash you can review it and be sure it does what it says.
 
 - **Extensibility**  
   These usage examples are just simplified use cases but there's a lot more
