@@ -11,6 +11,5 @@ else
     echo -e "${CY}ss -tunlp4 | grep \"$1\"${CN}"
     ss -tunlp4 | grep "$1"
 
-    echo -e "${CY}lsof -i \"$1\"${CN}"
-    lsof -i :$1
+    [[ "$1" =~ ^[0-9]+$ ]] && echo -e "${CY}lsof -i \"$1\"${CN}" && lsof -i :"$1"
 fi
