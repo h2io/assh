@@ -137,7 +137,7 @@ echo -e "${CD}--------------------------------${RS}"
 
 # Display last login information with improved formatting
 echo -e "${CL}USERNAME         TTY      FROM             LOGIN TIME${RS}"
-last -a -d -n 5 | grep -v "reboot" | while read -r user tty from rest; do
+last -a -n 5 | grep -v "reboot" | while read -r user tty from rest; do
     printf "${CW}%-16s %-8s %-17s %s${RS}\n" "$user" "$tty" "$from" "$rest"
 done
 
