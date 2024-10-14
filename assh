@@ -2,18 +2,18 @@
 
 XT=${XH:-~/.assh*/}
 XH=${XH:=~/.assh.d}
-a="" h="" r=""
+a="" h="" r="" sp=""
 shc () {
 [[ "$sf" == /tmp/* ]] && rm "$sf"
 [[ "$sd" == /tmp/* ]] && { rmdir "$sd" 2>/dev/null || echo "[assh] $sd contains data"; } || :
 ec=$(find /tmp -type d -name 'assh-*' -empty 2>/dev/null | wc -l)
 nc=$(find /tmp -type d -name 'assh-*' ! -empty 2>/dev/null | wc -l)
+[[ -n "$sp" ]] && kill "$sp" 2>/dev/null && echo "[assh] rsync PID $sp killed" && sp="" || echo "[assh] failed to kill rsync or already terminated"
 (( nc > 0 || ec > 20 )) && echo "[assh] /tmp/assh-* dirs: $nc with data, $ec empty";}
 shd () {
 sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
 printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
-rsync --daemon --no-detach --config="$sf" &
-}
+rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
 [ ! -f "$XH/.asshrc" ] && echo "[assh] missing file: $XH/.asshrc" >&2 && exit 1
@@ -28,7 +28,7 @@ XK=$(ssh -q -t "$h" "cat /etc/machine-id | openssl dgst -sha256 -hex -r | cut -d
 o="openssl enc -aes-256-cbc -a -K $XK -iv $XI"
 od="openssl enc -aes-256-cbc -a -K \$XK -iv \$XI -d"
 unset XK
-read -r -d '' s <<EOB
+	read -r -d '' s <<EOB
 export XV="$XV"
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
 export PATH=\$XH:\$XH/bin:\$PATH
