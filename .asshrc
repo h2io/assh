@@ -3,16 +3,18 @@
 # prevent loops
 [ "$ASSHRC" ] && return || export ASSHRC=true
 
-export XV=$(
-cd "$(dirname "${BASH_SOURCE[0]}")" || exit
-xv=$(echo -n $(cat VERSION))
-if command -v git >/dev/null 2>&1; then
-	xd=$(git log -1 --format="%cd" --remotes=origin --date=format:"%yw%W.%u" 2>/dev/null || echo "")
-	[ -n "$xd" ] && xv="${xv%%-*}"
-	xs=$(git rev-parse --short HEAD 2>/dev/null || echo "")
-fi
-echo "h2.io/ASSH $xv${xd:+-$xd}${xs:+-$xs}"
-)
+xv_() {
+  sd="$(dirname "${BASH_SOURCE[0]}")"
+  xv=$(cat "${sd}/VERSION")
+  
+  if command -v git >/dev/null 2>&1; then
+    xd=$(git -C "$sd" log -1 --format="%cd" --remotes=origin --date=format:"%yw%W.%u" 2>/dev/null || echo "")
+    [ -n "$xd" ] && xv="${xv%%-*}"
+    xs=$(git -C "$sd" rev-parse --short HEAD 2>/dev/null || echo "")
+    [ -n "$(git -C "$sd" status --porcelain 2>/dev/null)" ] && xs="$xs-dirty"
+  fi
+  XV="h2.io/ASSH $xv${xd:+-$xd}${xs:+-$xs}"
+}
 
 # HELP: grep history
 alias ,hg='history|grep'
@@ -35,6 +37,9 @@ if [ "$XH" ]; then
 	done
 fi
 if [ "$LH" ]; then
+	export XV && xv_
+	[ -n "$XD" ] && PROMPT_COMMAND=xv_
+
 	# executed when sourced localy from .bashrc
 	for dir in $(ls -d ~/.assh*/bin 2>/dev/null | sort); do
 		[[ -d "$dir" ]] && PATH="$dir:$PATH"
