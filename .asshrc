@@ -2,13 +2,25 @@
 
 # prevent loops
 [ "$ASSHRC" ] && return || export ASSHRC=true
-export XV="h2.io/ASSH v1.03-24w41"
+
+export XV=$(
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit
+xv=$(echo -n $(cat VERSION))
+if command -v git >/dev/null 2>&1; then
+	xd=$(git log -1 --format="%cd" --remotes=origin --date=format:"%yw%W.%u" 2>/dev/null || echo "")
+	xs=$(git rev-parse --short HEAD 2>/dev/null || echo "")
+fi
+echo "h2.io/ASSH $xv${xd:+-$xd}${xs:+-$xs}"
+)
 
 # HELP: grep history
 alias ,hg='history|grep'
 
 # HELP: ls ordered, human readable
 alias ,ls='ls --human-readable --size -1 -S -F'
+
+# HELP: clean current history
+alias ,h0='unset HISTFILE && history -c && history -r ~/.bash_history'
 
 if [ "$XH" ]; then
 	# executed via assh login
