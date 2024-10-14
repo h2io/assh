@@ -8,12 +8,12 @@ xv_() {
   xv=$(cat "${sd}/VERSION")
   
   if command -v git >/dev/null 2>&1; then
-    xd=$(git -C "$sd" log -1 --format="%cd" --remotes=origin --date=format:"%yw%W.%u" 2>/dev/null || echo "")
-    [ -n "$xd" ] && xv="${xv%%-*}"
+    xd=$(git -C "$sd" log -1 --format="%cd" --remotes=origin --date=format-local:"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "")
+    [ -n "$xd" ] && xv="${xv%% *}"
     xs=$(git -C "$sd" rev-parse --short HEAD 2>/dev/null || echo "")
     [ -n "$(git -C "$sd" status --porcelain 2>/dev/null)" ] && xs="$xs-dirty"
   fi
-  XV="h2.io/ASSH $xv${xd:+-$xd}${xs:+-$xs}"
+  XV="h2.io/ASSH $xv${xd:+ $xd}${xs:+ $xs}"
 }
 
 # HELP: grep history

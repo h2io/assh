@@ -1,0 +1,19 @@
+#!/bin/bash
+# HELP: show local assh version and latest github version
+
+# Source colors
+. ${XH:=~/.assh.d}/lib/colors
+
+# Fetch the latest commit checksum from GitHub
+gsha=$(curl -s "https://api.github.com/repos/h2io/assh/commits/main" | jq -r '.sha[:7]')
+gdate=$(curl -s "https://api.github.com/repos/h2io/assh/commits/main" | jq -r '.commit.author.date')
+
+# Extract the local version SHA
+lsha=$(echo "$XV" | cut -d"-" -f3-)
+
+
+
+# Output versions with color
+echo -e "${CG}Local version:${CN} $XV"
+echo -e "${CB}https://github.com/h2io/assh:${CN}    $gdate $gsha"
+
