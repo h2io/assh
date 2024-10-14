@@ -7,8 +7,8 @@ export XV=$(
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit
 xv=$(echo -n $(cat VERSION))
 if command -v git >/dev/null 2>&1; then
-	xv="${xv%%-*}"
 	xd=$(git log -1 --format="%cd" --remotes=origin --date=format:"%yw%W.%u" 2>/dev/null || echo "")
+	[ -n "$xd" ] && xv="${xv%%-*}"
 	xs=$(git rev-parse --short HEAD 2>/dev/null || echo "")
 fi
 echo "h2.io/ASSH $xv${xd:+-$xd}${xs:+-$xs}"
