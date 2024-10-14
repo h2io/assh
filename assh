@@ -8,7 +8,7 @@ shc () {
 [[ "$sd" == /tmp/* ]] && { rmdir "$sd" 2>/dev/null || echo "[assh] $sd contains data"; } || :
 ec=$(find /tmp -type d -name 'assh-*' -empty 2>/dev/null | wc -l)
 nc=$(find /tmp -type d -name 'assh-*' ! -empty 2>/dev/null | wc -l)
-[[ -n "$sp" ]] && kill "$sp" 2>/dev/null && echo "[assh] rsync PID $sp killed" && sp="" || echo "[assh] failed to kill rsync or already terminated"
+[[ -n "$sp" ]] && { kill "$sp" 2>/dev/null && echo "[assh] rsync PID $sp killed" && sp="" || echo "[assh] failed to kill rsync or already terminated"; }
 (( nc > 0 || ec > 20 )) && echo "[assh] /tmp/assh-* dirs: $nc with data, $ec empty";}
 shd () {
 sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
