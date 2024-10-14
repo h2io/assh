@@ -69,6 +69,11 @@ ASSH behaves just like SSH but with added convenience and functionality:
 
     `,copy <path>`
 
+- **ControlMaster by Default**  
+  ASSH enables ControlMaster by default for faster multi-server connections.  
+  Use `-M0` to disable or `-MX` to close the ControlMaster socket.  
+  This ensures speed and control without lengthy CLI parameters.
+
 - **No login messages**  
   By default, you get no motd messages. This behavior is controlled by the
   `.hushlogin` and `.hushassh` files. Removing these files will show you the
