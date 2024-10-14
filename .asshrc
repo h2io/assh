@@ -8,7 +8,7 @@ xv_() {
   xv=$(cat "${sd}/VERSION")
   
   if command -v git >/dev/null 2>&1; then
-    xd=$(git -C "$sd" log -1 --format="%cd" --remotes=origin --date=format-local:"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "")
+    xd=$(git -C "$sd" log -1 --format="%cd" --remotes=origin --date=iso-strict 2>/dev/null | xargs -I{} date -u -d "{}" +"%Y-%m-%dT%H:%M:%SZ" || echo "")
     [ -n "$xd" ] && xv="${xv%% *}"
     xs=$(git -C "$sd" rev-parse --short HEAD 2>/dev/null || echo "")
     [ -n "$(git -C "$sd" status --porcelain 2>/dev/null)" ] && xs="$xs-dirty"
