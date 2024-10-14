@@ -2,7 +2,8 @@
 
 XT=${XH:-~/.assh*/}
 XH=${XH:=~/.assh.d}
-a="" h="" r="" sp=""
+a="" am=" -o ControlMaster=auto -o ControlPath=~/.ssh/.assh-%r@%h:%p -o ControlPersist=yes"
+h="" r="" sp=""
 shc () {
 [[ "$sf" == /tmp/* ]] && rm "$sf"
 [[ "$sd" == /tmp/* ]] && { rmdir "$sd" 2>/dev/null || echo "[assh] $sd contains data"; } || :
@@ -22,18 +23,11 @@ tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
 #echo $(tar $tp|tar -tzf -)
 z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
 trap shc 0
-XK=$(openssl rand -hex 32)
-XI=$(openssl rand -hex 16)
-XK=$(ssh -q -t "$h" "cat /etc/machine-id | openssl dgst -sha256 -hex -r | cut -d ' ' -f1" | cut -c1-64)
-o="openssl enc -aes-256-cbc -a -K $XK -iv $XI"
-od="openssl enc -aes-256-cbc -a -K \$XK -iv \$XI -d"
-unset XK
+o="openssl base64"; od="openssl base64 -d"
 	read -r -d '' s <<EOB
-export XV="$XV"
+export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
 export PATH=\$XH:\$XH/bin:\$PATH
-export XK=$XK;export XI=$XI;export XZ=$z
-export XK=\$(cat /etc/machine-id | openssl dgst -sha256 -hex -r | cut -d ' ' -f1 | cut -c1-64)
 ${XP:+export XP=$XP}
 echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
 [ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
@@ -43,7 +37,7 @@ unset XK XI
 bash -c $'trap "[[ \$XH == /tmp/ssh+* ]] && rm -rf \$XH;" EXIT; bash --rcfile \$XH/.asshrc'
 EOB
 #echo "h:$h";echo $a;echo "s:$s"
-ssh -t "$h" $a "$s";}
+ssh -t "$h" $a$am "$s";}
 hR() {
 if [[ -z $1 || $1 == -* || ! $1 =~ ^[0-9]+:[^:]+:[0-9]+$ ]]; then
 XP=${XP:-$(shuf -i 50000-65000 -n 1)}
@@ -54,6 +48,8 @@ while [[ $# -gt 0 ]]; do
 case $1 in
 -V) echo "$XV, $(ssh -V 2>&1)"; exit 0 ;;
 -R) hR "$2";shift $?;;
+-M0) am="";shift;;
+-MX) am+=" -O exit";shift;;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;
 -*) [[ $1 == "-R" ]]&&{ hR "$2";shift $?;}||a+=" $1";;
  *) [[ -z $h ]]&&h=${1%%[/:]}||{ r="${*};exit"; break;} ;;
