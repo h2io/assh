@@ -56,7 +56,7 @@ case $1 in
 -R) hR "$2";shift $?;;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;
 -*) [[ $1 == "-R" ]]&&{ hR "$2";shift $?;}||a+=" $1";;
- *) [[ -z $h ]]&&h=$1||{ r="${*};exit"; break;} ;;
+ *) [[ -z $h ]]&&h=${1%%[/:]}||{ r="${*};exit"; break;} ;;
 esac;shift;done
 [[ $h ]]||{ ssh $a;exit $?;}
 return 0;};arg "$@" && assh
