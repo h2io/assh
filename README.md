@@ -1,6 +1,28 @@
 # ASSH - Augmented SSH
 **Automated, Self-Propagating Shell Enhancements for Every SSH Session**
 
+ASSH extends your local shell environment to remote SSH sessions, applying
+your local scripts and shell configs without the need for remote modifications.
+
+## Key Features
+
+- **Local Environment Replication**  
+  Bring your `.bashrc`, and other local shell configs and scripts into
+  remote sessions automatically. Enjoy the familiarity of your local setup,
+  no matter which server you connect to.
+
+- **Zero Remote Changes**  
+  Keep remote servers clean and secure. ASSH doesn’t modify remote
+  configurations or scripts, making it lightweight and unobtrusive.
+
+- **Zero or Easy Setup**  
+  ASSH is designed for simplicity. Configuration files are straightforward,
+  allowing you to set up quickly and with minimal effort.
+
+- **100% bash**  
+  Written entirely in Bash for maximum portability across different systems
+  and terminals.
+
 
 ## Usage
 
