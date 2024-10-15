@@ -1,0 +1,2 @@
+export LH=${LH%/*}
+sudo -E su -c "ASSHRC='' bash --rcfile \"$LH/.bashrc\""
