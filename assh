@@ -46,7 +46,7 @@ else a+=" -R $1";return 1;fi;}
 arg() {
 while [[ $# -gt 0 ]]; do
 case $1 in
--V) echo "$XV, $(ssh -V 2>&1)"; exit 0 ;;
+-V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0 ;;
 -R) hR "$2";shift $?;;
 -M0) am="";shift;;
 -MX) am+=" -O exit";shift;;
