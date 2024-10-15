@@ -16,6 +16,9 @@ xv_() {
   XV="h2.io/ASSH $xv${xd:+ $xd}${xs:+ $xs}"
 }
 
+# HELP: use assh by default when you call ssh (use \ssh if you want he original ssh)
+alias ssh='assh'
+
 # HELP: grep history
 alias ,hg='history|grep'
 
@@ -41,9 +44,10 @@ if [ "$LH" ]; then
 	[ -n "$XD" ] && PROMPT_COMMAND=xv_
 
 	# executed when sourced localy from .bashrc
-	for dir in $(ls -d ~/.assh*/bin 2>/dev/null | sort); do
+	for dir in $(ls -d $LH/.assh*/bin 2>/dev/null | sort); do
 		[[ -d "$dir" ]] && PATH="$dir:$PATH"
 	done
+	LH+="/.assh.d"
 	export PATH=$LH:$PATH
 
 	for file in $LH/lib/*; do

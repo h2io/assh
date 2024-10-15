@@ -1,6 +1,7 @@
 #!/bin/bash
+# HELP: display this help
 
-. ${XH:=~/.assh.d}/lib/colors
+. ${XH:=$LH}/lib/colors
 
 XB=$XH/bin
 
@@ -36,7 +37,7 @@ while IFS= read -r line; do
 done < "$ALIAS_FILE"
 
 # Print help for each alias
-printf "${CD}# --- aliases${CN}\n"
+printf "${CD}# --- aliases ($XH/.asshrc)${CN}\n"
 for alias_name in "${!alias_help[@]}"; do
     if [[ "${alias_help[$alias_name]}" == "???" ]]; then
 	    printf "${CG}%-${max_length}s  ${CR}%s${CN}\n" "$alias_name" "${alias_help[$alias_name]}"
@@ -46,7 +47,7 @@ for alias_name in "${!alias_help[@]}"; do
 done
 
 # Print help for scripts
-printf "${CD}# --- scripts${CN}\n"
+printf "${CD}# --- scripts ($XB/*)${CN}\n"
 for script in "$XB/"*; do
     help_line=$(grep -m 1 '^# HELP:' "$script")
     if [[ -n "$help_line" ]]; then

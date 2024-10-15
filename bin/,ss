@@ -1,7 +1,7 @@
 #!/bin/bash
 # HELP: ,ss [PORT] - Shows network connections, optionally filtered by PORT
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/colors"
+. ${XH:=$LH}/lib/colors
 
 if [ -z "$1" ]; then
     # No port provided, just run ss

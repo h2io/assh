@@ -1,7 +1,7 @@
 #!/bin/bash
 # HELP: enhanced message of the day with virtualization detection
 
-. ${XH:=~/.assh.d}/lib/colors
+. ${XH:=$LH}/lib/colors
 
 # Function to detect virtualization
 detect_virtualization() {

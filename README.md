@@ -35,8 +35,8 @@ your local scripts and shell configs without the need for remote modifications.
 
 ```
 # ASSH: load the last alphabetically ordered ~/assh*/.asshrc
-export LH=~/.assh.d
-file=$(ls -d ~/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
+export LH="${LH:-$(eval echo ~)}"
+file=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
 [[ -f $file ]] && source "$file" || true
 ```
 
@@ -73,6 +73,10 @@ ASSH behaves just like SSH but with added convenience and functionality:
   ASSH enables ControlMaster by default for faster multi-server connections.  
   Use `-M0` to disable or `-MX` to close the ControlMaster socket.  
   This ensures speed and control without lengthy CLI parameters.
+
+- **sudo support**  
+  You can keep using your ASSD config even after you `sudo su`.
+  Just use `,su` and all the configurations and scripts are available to you.
 
 - **No login messages**  
   By default, you get no motd messages. This behavior is controlled by the

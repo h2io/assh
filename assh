@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-
-XT=${XH:-~/.assh*/}
-XH=${XH:=~/.assh.d}
+LH="${LH:-$(eval echo ~)}"
+LH=${LH%/*}
+XT=$(eval echo "${XH:-$LH/.assh*}")
+XH=$(eval echo "${XH:=$LH/.assh.d}")
 a="" am=" -o ControlMaster=auto -o ControlPath=~/.ssh/.assh-%r@%h:%p -o ControlPersist=yes"
 h="" r="" sp=""
 shc () {
