@@ -75,7 +75,7 @@ ASSH behaves just like SSH but with added convenience and functionality:
   This ensures speed and control without lengthy CLI parameters.
 
 - **sudo support**  
-  You can keep using your ASSD config even after you `sudo su`.
+  You can keep using your ASSD config even after you `sudo su`.  
   Just use `,su` and all the configurations and scripts are available to you.
 
 - **No login messages**  
