@@ -30,9 +30,7 @@ your local scripts and shell configs without the need for remote modifications.
 
 For a simple setup you could run this in your terminal:
 ```
-cd
-git clone https://github.com/h2io/assh.git
-ln -s assh .assh.d
+git clone https://github.com/h2io/assh.git ~/.assh.d
 ```
 
 Add this to your `.bashrc`:
@@ -44,14 +42,15 @@ export LH="${LH:-$(eval echo ~)}"
 ### Development Setup
 For development you could add this instead:
 ```
-export XD=1     # develop flag ... refreshes ASSH version on PROMPT_COMMAND
-export LH="${LH:-$(eval echo ~)}"
-file=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
-[[ -f $file ]] && source "$file" || true
+export XD=1                         # develop flag
+export LH="${LH:-$(eval echo ~)}"   # sudo support
+XF=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
+[[ -f $XF ]] && . "$XF" || true
 ```
 
 This will load the last alpabetically ordered `~/.assh*/.asshrc`.  
 You probably don't need more than one but it's sometimes usefull.  
+The develop flag now only refreshes ASSH version on PROMPT_COMMAND, for now.
   
 The `.asshrc` file contails an alias for ssh to automatically use assh.  
 You can comment that line if you prefer or just use `\ssh` for plain ssh.  
