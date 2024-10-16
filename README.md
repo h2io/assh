@@ -27,20 +27,28 @@ your local scripts and shell configs without the need for remote modifications.
 ## Usage
 
 ### Setup
-1. **Copy or Link Directory**  
-   Copy or symlink the ASSH directory to `~/.assh.d`:
 
-2. **Edit .bashrc**  
-   To ensure ASSH and all `~/.assh*/bin/` are available add this to ~/.bashrc:
-
+For a simple setup you could run this in your terminal:
 ```
-# ASSH: load the last alphabetically ordered ~/assh*/.asshrc
+cd
+git clone https://github.com/h2io/assh.git
+ln -s assh .assd.d
+```
+
+Add this to your `.bashrc`:
+```
 export LH="${LH:-$(eval echo ~)}"
 file=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
 [[ -f $file ]] && source "$file" || true
 ```
 
-3. **Automatic Transfer to Server**  
+This will load the last alpabetically ordered `~/.assh*/.asshrc`.  
+You probably don't need more than one but it's sometimes usefull.  
+  
+The `.asshrc` file contails an alias for ssh to automatically use assh.  
+You can comment that line if you prefer or just use `\ssh` for plain ssh.
+
+**Automatic Transfer to Server**  
    When you connect to a server, the contents of `~/.assh.d` are automatically
    copied, including the ASSH script, allowing you to use ASSH directly from
    that server to other servers.
