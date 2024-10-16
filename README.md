@@ -26,7 +26,7 @@ your local scripts and shell configs without the need for remote modifications.
 
 ## Usage
 
-### Setup
+### Simple Setup
 
 For a simple setup you could run this in your terminal:
 ```
@@ -41,6 +41,7 @@ export LH="${LH:-$(eval echo ~)}"
 . "$LH/.assh.d/.asshrc" || echo "[assh] file not found"
 ```
 
+### Development Setup
 For development you could add this instead:
 ```
 export XD=1     # develop flag ... refreshes ASSH version on PROMPT_COMMAND
