@@ -16,9 +16,6 @@ xv_() {
   XV="h2.io/ASSH $xv${xd:+ $xd}${xs:+ $xs}"
 }
 
-# HELP: use assh by default when you call ssh (use \ssh if you want he original ssh)
-alias ssh='assh'
-
 # HELP: grep history
 alias ,hg='history|grep'
 

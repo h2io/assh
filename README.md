@@ -35,6 +35,7 @@ git clone https://github.com/h2io/assh.git ~/.assh.d
 
 Add this to your `.bashrc`:
 ```
+alias ssh='assh'                    # use \ssh for plain ssh
 export LH="${LH:-$(eval echo ~)}"
 . "$LH/.assh.d/.asshrc" || echo "[assh] file not found"
 ```
@@ -42,8 +43,9 @@ export LH="${LH:-$(eval echo ~)}"
 ### Development Setup
 For development you could add this instead:
 ```
+alias ssh='assh'                    # use \ssh for plain ssh
 export XD=1                         # develop flag
-export LH="${LH:-$(eval echo ~)}"   # sudo support
+export LH="${LH:-$(eval echo ~)}"   # needed for sudo support
 XF=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
 [[ -f $XF ]] && . "$XF" || true
 ```
@@ -52,9 +54,6 @@ This will load the last alpabetically ordered `~/.assh*/.asshrc`.
 You probably don't need more than one but it's sometimes usefull.  
 The develop flag now only refreshes ASSH version on PROMPT_COMMAND, for now.
   
-The `.asshrc` file contails an alias for ssh to automatically use assh.  
-You can comment that line if you prefer or just use `\ssh` for plain ssh.  
-
 **Automatic Transfer to Server**  
    When you connect to a server, the contents of `~/.assh*` are automatically  
    copied, including the ASSH script, allowing you to use ASSH directly from  
