@@ -32,11 +32,18 @@ For a simple setup you could run this in your terminal:
 ```
 cd
 git clone https://github.com/h2io/assh.git
-ln -s assh .assd.d
+ln -s assh .assh.d
 ```
 
 Add this to your `.bashrc`:
 ```
+export LH="${LH:-$(eval echo ~)}"
+. "$LH/.assh.d/.asshrc" || echo "[assh] file not found"
+```
+
+For development you could add this instead:
+```
+export XD=1     # develop flag ... refreshes ASSH version on PROMPT_COMMAND
 export LH="${LH:-$(eval echo ~)}"
 file=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
 [[ -f $file ]] && source "$file" || true

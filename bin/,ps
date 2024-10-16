@@ -7,5 +7,5 @@ sort_option="pid"
 ps -eo pid,ppid,user,etime,%cpu,cmd --forest --sort="$sort_option"
 
 # Show usage example as the last line:
-echo -e "${CY}Usage:${CW} ./,proc [%pid | %mem | pid | ppid | -etime]"
+echo -e "${CY}Usage:${CN} ./,ps [%pid | %mem | pid | ppid | -etime]"
 
