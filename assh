@@ -17,6 +17,7 @@ sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
 printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
 rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
+#echo "h:$h";echo "a:$a$am";echo "r:$r"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
 [ ! -f "$XH/.asshrc" ] && echo "[assh] missing file: $XH/.asshrc" >&2 && exit 1
 te="--exclude={.git,LICENSE}";tx=$(eval echo $te)
@@ -37,7 +38,7 @@ echo "$r" >> \$XH/.asshrc
 unset XK XI
 bash -c $'trap "[[ \$XH == /tmp/ssh+* ]] && rm -rf \$XH;" EXIT; bash --rcfile \$XH/.asshrc'
 EOB
-#echo "h:$h";echo $a;echo "s:$s"
+#echo "s:$s"
 ssh -t "$h" $a$am "$s";}
 hR() {
 if [[ -z $1 || $1 == -* || ! $1 =~ ^[0-9]+:[^:]+:[0-9]+$ ]]; then
@@ -49,11 +50,11 @@ while [[ $# -gt 0 ]]; do
 case $1 in
 -V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0 ;;
 -R) hR "$2";shift $?;;
--M0) am="";shift;;
--MX) am+=" -O exit";shift;;
+-M0) am="";;
+-MX) am+=" -O exit";;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;
--*) [[ $1 == "-R" ]]&&{ hR "$2";shift $?;}||a+=" $1";;
+-*) a+=" $1";;
  *) [[ -z $h ]]&&h=${1%%[/:]}||{ r="${*};exit"; break;} ;;
 esac;shift;done
-[[ $h ]]||{ ssh $a;exit $?;}
+[[ $h ]]||{ ssh $a$am;exit $?;}
 return 0;};arg "$@" && assh
