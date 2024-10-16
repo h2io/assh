@@ -20,7 +20,7 @@ assh() {
 #echo "h:$h";echo "a:$a$am";echo "r:$r"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
 [ ! -f "$XH/.asshrc" ] && echo "[assh] missing file: $XH/.asshrc" >&2 && exit 1
-te="--exclude={.git,LICENSE}";tx=$(eval echo $te)
+te="--exclude={.git,LICENSE,README.md}";tx=$(eval echo $te)
 tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
 #echo $(tar $tp|tar -tzf -)
 z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
