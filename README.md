@@ -49,7 +49,7 @@ The `.asshrc` file contails an alias for ssh to automatically use assh.
 You can comment that line if you prefer or just use `\ssh` for plain ssh.
 
 **Automatic Transfer to Server**  
-   When you connect to a server, the contents of `~/.assh.d` are automatically
+   When you connect to a server, the contents of `~/.assh*` are automatically
    copied, including the ASSH script, allowing you to use ASSH directly from
    that server to other servers.
 
