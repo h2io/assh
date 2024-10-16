@@ -1,2 +1,3 @@
 export LH=${LH%/*}
-sudo -E su - ${1:-root} -c "ASSHRC='' LH=$LH bash --rcfile \"$LH/.bashrc\""
+#sudo -E su - ${1:-root} -c "ASSHRC='' LH=$LH bash --rcfile \"$LH/.bashrc\""
+sudo -E -u "${1:-root}" bash -c "ASSHRC='' LH='$LH' bash --rcfile '$LH/.bashrc'"
