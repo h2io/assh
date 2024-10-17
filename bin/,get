@@ -1,5 +1,5 @@
 #!/bin/bash
-# HELP: ,get path rsyncs the path from this machine to the original assh machine
+# HELP: ,get path (needs assh -R on the machine you want to rsync the path)
 
 # Ensure the source directory argument is provided (required)
 if [[ -z $1 ]]; then

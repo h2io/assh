@@ -1,0 +1,31 @@
+#!/bin/bash
+# HELP: Show common commands categorized by usage.
+
+# Load color definitions
+. ${XH:=$LH}/lib/colors
+
+echo -e "${CB}===[ SYSTEM INFORMATION ]===${CN}"
+echo -e "${CY}uname -a${CN}             # Show kernel version"
+echo -e "${CY}hostnamectl${CN}          # Show system hostname and details"
+echo -e "${CY}uptime${CN}               # Show system uptime"
+echo -e "${CY}df -h${CN}                # Show disk space usage"
+
+echo -e "\n${CB}===[ FILE & DIRECTORY MANAGEMENT ]===${CN}"
+echo -e "${CY},du /var${CN}             # "
+echo -e "${CY},ls -lt -h /tmp${CN}      # latest updated (-h human readable)"
+echo -e "${CY}ls -alSr -h -lt${CN}      # "
+
+echo -e "\n${CB}===[ NETWORKING ]===${CN}"
+echo -e "${CY},ss${CN}                  # Show listening ports and services"
+
+echo -e "\n${CB}===[ PROCESS MANAGEMENT ]===${CN}"
+echo -e "${CY}ps aux${CN}               # List all running processes"
+echo -e "${CY}top${CN}                  # Show real-time system usage"
+echo -e "${CY}kill -9 PID${CN}          # Kill a process by PID"
+echo -e "${CY}pkill -u user name${CN}   # Kill a process by name"
+echo -e "${CY}pkill -f pattern${CN}     # Kill a process by name pattern"
+echo -e "${CY}htop${CN}                 # Interactive process viewer"
+
+echo -e "\n${CB}===[ Docker? ]===${CN}"
+echo -e "${CY}docker something${CN}     # "
+

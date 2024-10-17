@@ -1,0 +1,46 @@
+#!/bin/bash
+# HELP: ls ordered by size, bytes + human readable
+
+ls_output=$(ls -a -l --size --block-size=1 -S -F --time-style=+"%Y-%m-%d %H:%M:%S" --color=always -r "$@")
+
+# Process the output using awk, color only the file name, and align
+echo "$ls_output" | awk '
+function human_readable(bytes) {
+    units[1] = "B"; units[2] = "K"; units[3] = "M"; units[4] = "G"; units[5] = "T"; units[6] = "P"
+    i = 1
+    while (bytes >= 1024 && i < 6) {
+        bytes /= 1024
+        i++
+    }
+    return sprintf((bytes >= 10 || i == 1) ? "%6.0f %s" : "%6.1f %s", bytes, units[i])
+}
+
+{
+    if ($1 == "total") {
+        print $0
+        next
+    }
+
+    # Identify color codes around the file name only
+    file_name_start = index($0, $9) # Adjust index for file name
+    match(substr($0, file_name_start), /\x1B\[[0-9;]*m/)
+    color_start = substr($0, RSTART + file_name_start - 1, RLENGTH)
+    color_end = "\033[0m"
+
+    # Strip colors for alignment purposes
+    line = $0
+    gsub(/\x1B\[[0-9;]*m/, "", line)
+
+    size = $6
+    hr_size = human_readable(size)
+
+    # Print with only file name colorized
+    printf "%s|%s|%s%s%s\n",
+           substr(line, 1, file_name_start - 1), # Everything before the file name
+           hr_size,                              # Human-readable size
+           color_start, $9, color_end            # File name with color
+}' | column -t -s '|' | while IFS= read -r line; do
+    # Output aligned lines with only the file name colored
+    echo -e "${line}"
+done
+
