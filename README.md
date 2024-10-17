@@ -83,7 +83,7 @@ ASSH behaves just like SSH but with added convenience and functionality:
   files directly from the connected servers. You only use -R when you first  
   start assh and the ,copy command will be available from all hosts.  
 
-    `,copy <path>`
+    `,get <path>`
 
 - **ControlMaster by Default**  
   ASSH enables ControlMaster by default for faster multi-server connections.  
