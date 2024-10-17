@@ -15,6 +15,17 @@ xv_() {
   fi
   XV="h2.io/ASSH $xv${xd:+ $xd}${xs:+ $xs}"
 }
+p+ () {
+    local r=""
+    IFS=':' read -r -a ps <<< "$1:$2"
+    for p in "${ps[@]}"; do
+        [[ ":$r:" != *":$p:"* ]] && r="$r:$p"
+    done
+    echo "${r#:}"
+}
+
+# HELP: uses assh by default instead of ssh (use \ssh if you want he original ssh)
+alias ssh='assh'
 
 # HELP: grep history
 alias ,hg='history|grep'
@@ -32,23 +43,48 @@ if [ "$XH" ]; then
 	[ -r ~/.bash_login ] && . ~/.bash_login ||
 	[ -r ~/.profile ] && . ~/.profile
 
-	for file in $XH/lib/*; do
-	    [[ -r "$file" ]] && . "$file"
-	done
+	export XPATH=$XH:$XH/bin
+	#echo "xpath-xh2:$XPATH"
+	XL=$XH/lib			# prepare XH libray path to load
+	PATH=$(p+ $XPATH $PATH)
 fi
 if [ "$LH" ]; then
+	#echo ".asshrc---if LH"
+	export LCHAIN+="+${USER}"
+	export LU=${LH%/*}
+	#export LD=$(ls -d ${LU}/.assh*/bin 2>/dev/null)
+	export LD=$(ls -d ${LU}/.assh*/bin 2>/dev/null| sort -u | tr '\n' ' ')
+	#export LF=$(ls -d $LU/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
+	#echo ".asshrc/LU: "$LU
+	#echo ".asshrc/LH: "$LH
+	#echo ".asshrc/LD: "$LD
+
 	export XV && xv_
 	[ -n "$XD" ] && PROMPT_COMMAND=xv_
 
-	# executed when sourced localy from .bashrc
-	for dir in $(ls -d $LH/.assh*/bin 2>/dev/null | sort); do
-		[[ -d "$dir" ]] && PATH="$dir:$PATH"
+	# P1: localy sourced from .bashrc (development)
+	export LPATH="${LPATH:+$LPATH:}$LH"
+	shopt -s nullglob
+	for dir in $LD; do
+		[[ -d "$dir" ]] || continue  # Skip if not a directory
+		LPATH="$LPATH:$dir"
 	done
-	LH+="/.assh.d"
-	export PATH=$LH:$PATH
 
-	for file in $LH/lib/*; do
-	    [[ -r "$file" ]] && . "$file"
-	done
+	#LH+="/.assh.d"
+
+	# P2: LH -> XH -> sudo -> LH*
+	# TODO: don't always execute (now it doesn't apply it just adds useless path... at best)
+	#[[ -d "$LH/bin" ]] && export XPATH="$LH/bin:$XPATH"
+	#echo "xpath-P2 :$XPATH"
+
+	: "${XL:=$LH/lib}"		# use LH library path if XH is not present
+	PATH=$(p+ $LPATH $PATH)
 fi
 
+# load libraries
+for file in $XL/*; do
+	#echo "file: "$file
+	[[ -r "$file" ]] && . "$file"
+done
+
+#export LH=${XH:-$LH}

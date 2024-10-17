@@ -1,3 +1,18 @@
-export LH=${LH%/*}
-#sudo -E su - ${1:-root} -c "ASSHRC='' LH=$LH bash --rcfile \"$LH/.bashrc\""
-sudo -E -u "${1:-root}" bash -c "ASSHRC='' LH='$LH' bash --rcfile '$LH/.bashrc'"
+# pick between LH:LocalHome and XH:TransferedHome
+# if XH is present it takes precedence
+H_=${XH:-$LH}
+
+# clean env to allow the new user to rebuild it from scratch
+LU=""
+LPATH=""
+
+if [[ -n "$XH" ]]; then
+    opt="XH=${H_}"
+elif [[ -n "$LH" ]]; then
+    opt="LH=${H_}"
+fi
+
+sudo -E su - "${1:-root}" -c "ASSHRC='' $opt LCHAIN=${LCHAIN} bash --rcfile \"${H_}/.bashrc\""
+
+#sudo -E su - ${1:-root} -c "ASSHRC='' LH=${LH} LCHAIN=${LCHAIN} bash --rcfile \"${H_}/.bashrc\""
+#sudo -E -u "${1:-root}" bash -c "ASSHRC='' LH='$LH' bash --rcfile \"${H_}/.bashrc\""

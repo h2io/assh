@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-LH="${LH:-$(eval echo ~)}"
-LH=${LH%/*}
-XT=$(eval echo "${XH:-$LH/.assh*}")
-XH=$(eval echo "${XH:=$LH/.assh.d}")
+XT=$(eval echo "${XH:-$LU/.assh*}")
+XW=$(eval echo "${XH:=$LU/.assh.d}")
 a="" am=" -o ControlMaster=auto -o ControlPath=~/.ssh/.assh-%r@%h:%p -o ControlPersist=yes"
 h="" r="" sp=""
 shc () {
@@ -17,19 +15,19 @@ sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
 printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
 rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
-#echo "h:$h";echo "a:$a$am";echo "r:$r"
+	#echo "h:$h";echo "a:$a$am";echo "r:$r"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
-[ ! -f "$XH/.asshrc" ] && echo "[assh] missing file: $XH/.asshrc" >&2 && exit 1
-te="--exclude={.git,LICENSE,README.md}";tx=$(eval echo $te)
+[ ! -f "$XW/.asshrc" ] && echo "[assh] missing file: $XW/.asshrc" >&2 && exit 1
+te="--exclude={.git,LICENSE,README*}";tx=$(eval echo $te)
 tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
-#echo $(tar $tp|tar -tzf -)
+	#echo "te: $te";echo "tp: $tp"
+	#echo $(tar $tp|tar -tzf -)
 z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
 trap shc 0
 o="openssl base64"; od="openssl base64 -d"
 	read -r -d '' s <<EOB
 export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
-export PATH=\$XH:\$XH/bin:\$PATH
 ${XP:+export XP=$XP}
 echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
 [ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
@@ -49,6 +47,16 @@ arg() {
 while [[ $# -gt 0 ]]; do
 case $1 in
 -V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0 ;;
+-x) 
+	echo "LU: $LU" 
+	echo "LH: $LH"
+	echo "LD: $LD"
+	echo "LPATH: $LPATH"
+	echo
+	echo "XH: $XH"
+	echo "XW: $XW"
+	echo "XT: $XT"
+	exit 0 ;;
 -R) hR "$2";shift $?;;
 -M0) am="";;
 -MX) am+=" -O exit";;

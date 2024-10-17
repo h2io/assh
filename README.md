@@ -35,18 +35,19 @@ git clone https://github.com/h2io/assh.git ~/.assh.d
 
 Add this to your `.bashrc`:
 ```
-alias ssh='assh'                    # use \ssh for plain ssh
-export LH="${LH:-$(eval echo ~)}"
-. "$LH/.assh.d/.asshrc" || echo "[assh] file not found"
+export LH="${LH:-$(eval echo ${HOME}/.assh.d)}"
+. "$LH/.asshrc" || echo "[assh] file not found"
 ```
 
 ### Development Setup
 For development you could add this instead:
 ```
-alias ssh='assh'                    # use \ssh for plain ssh
+export LH="${LH:-$(eval echo ${HOME}/.assh.d)}"
+. "$LH/.asshrc" || echo "[assh] file not found"
+
 export XD=1                         # develop flag
-export LH="${LH:-$(eval echo ~)}"   # needed for sudo support
-XF=$(ls -d $LH/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
+export LU="${LU:-$(eval echo ~)}"
+XF=$(ls -d $LU/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
 [[ -f $XF ]] && . "$XF" || true
 ```
 
