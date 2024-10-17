@@ -76,6 +76,7 @@ ASSH behaves just like SSH but with added convenience and functionality:
   I use filenames prefixed by `,` for easy lookup with `,<tab><tab>`  
 
     `,help`
+    `,cheat`
 
 - **Reverse Port Forwarding with Copying**  
   Using `assh -R host` sets up reverse port forwarding, enabling you to copy  
