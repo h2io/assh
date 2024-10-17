@@ -75,8 +75,8 @@ ASSH behaves just like SSH but with added convenience and functionality:
   Any executable scripts in the `bin` subdirectory are automatically available.  
   I use filenames prefixed by `,` for easy lookup with `,<tab><tab>`  
 
-    `,help`
-    `,cheat`
+    `,help`  
+    `,cheat`  
 
 - **Reverse Port Forwarding with Copying**  
   Using `assh -R host` sets up reverse port forwarding, enabling you to copy  
@@ -88,7 +88,7 @@ ASSH behaves just like SSH but with added convenience and functionality:
 - **ControlMaster by Default**  
   ASSH enables ControlMaster by default for faster multi-server connections.  
   Use `-M0` to disable or `-MX` to close the ControlMaster socket.  
-  This ensures speed and control without lengthy CLI parameters.  
+  This ensures speed and control without using lengthy CLI parameters.  
 
 - **sudo support**  
   You can keep using your ASSH config even after you `sudo su`.  
