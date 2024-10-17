@@ -24,14 +24,17 @@ p+ () {
     echo "${r#:}"
 }
 
-# HELP: uses assh by default instead of ssh (use \ssh if you want he original ssh)
+# HELP: uses assh by default instead of ssh (use \ssh if you want the plain ssh)
 alias ssh='assh'
 
-# HELP: grep history
+# HELP: history | grep 
 alias ,hg='history|grep'
 
-# HELP: ls ordered, human readable
-alias ,ls='ls --human-readable --size -1 -S -F'
+# HELP: ls ordered by size, expanded time style (-h for human readable)
+alias ,ls='ls -a -l --human-readable --size --block-size=1 -S -F --time-style=+"%Y-%m-%d %H:%M:%S" -r'
+
+# HELP: du ordered, human readable
+alias ,du='function _du() { du --max-depth=1 -h "${1:-./}" 2>/dev/null | sort -h; }; _du'
 
 # HELP: clean current history
 alias ,h0='unset HISTFILE && history -c && history -r ~/.bash_history'
@@ -44,20 +47,13 @@ if [ "$XH" ]; then
 	[ -r ~/.profile ] && . ~/.profile
 
 	export XPATH=$XH:$XH/bin
-	#echo "xpath-xh2:$XPATH"
 	XL=$XH/lib			# prepare XH libray path to load
 	PATH=$(p+ $XPATH $PATH)
 fi
 if [ "$LH" ]; then
-	#echo ".asshrc---if LH"
 	export LCHAIN+="+${USER}"
 	export LU=${LH%/*}
-	#export LD=$(ls -d ${LU}/.assh*/bin 2>/dev/null)
 	export LD=$(ls -d ${LU}/.assh*/bin 2>/dev/null| sort -u | tr '\n' ' ')
-	#export LF=$(ls -d $LU/.assh*/.asshrc 2>/dev/null | sort | tail -n 1)
-	#echo ".asshrc/LU: "$LU
-	#echo ".asshrc/LH: "$LH
-	#echo ".asshrc/LD: "$LD
 
 	export XV && xv_
 	[ -n "$XD" ] && PROMPT_COMMAND=xv_
@@ -70,21 +66,11 @@ if [ "$LH" ]; then
 		LPATH="$LPATH:$dir"
 	done
 
-	#LH+="/.assh.d"
-
-	# P2: LH -> XH -> sudo -> LH*
-	# TODO: don't always execute (now it doesn't apply it just adds useless path... at best)
-	#[[ -d "$LH/bin" ]] && export XPATH="$LH/bin:$XPATH"
-	#echo "xpath-P2 :$XPATH"
-
 	: "${XL:=$LH/lib}"		# use LH library path if XH is not present
 	PATH=$(p+ $LPATH $PATH)
 fi
 
 # load libraries
 for file in $XL/*; do
-	#echo "file: "$file
 	[[ -r "$file" ]] && . "$file"
 done
-
-#export LH=${XH:-$LH}
