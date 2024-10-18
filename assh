@@ -44,9 +44,9 @@ XP=${XP:-$(shuf -i 50000-65000 -n 1)}
 a+=" -R $XP:localhost:$XP";shd
 else a+=" -R $1";return 1;fi;}
 hH() {
-    local f="${XH:-$LH}/.hosts" h="${1%%[/:]*}"
-    [[ -f $f ]] && awk -v h="$h" '$0 ~ "(^|[[:space:]])"h"($|[[:space:]])" {print $1; exit}' "$f" || echo "$h"
-}
+local f="${XH:-$LH}/.hosts" h="${1%%[/:]*}" r
+r=$(awk -v h="$h" '$0 ~ "(^|[[:space:]])"h"($|[[:space:]])" {print $1; exit}' "$f" 2>/dev/null)
+echo "${r:-$h}";}
 arg() {
 while [[ $# -gt 0 ]]; do
 case $1 in
