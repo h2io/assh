@@ -67,7 +67,7 @@ if [ "$LH" ]; then
 	done
 
 	: "${XL:=$LH/lib}"		# use LH library path if XH is not present
-	PATH=$(p+ $LPATH $PATH)
+	PATH=$(p+ $PATH $LPATH)
 fi
 
 # load libraries
