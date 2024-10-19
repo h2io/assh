@@ -52,24 +52,14 @@ echo "${r:-$h}";}
 arg() {
 while [[ $# -gt 0 ]]; do
 case $1 in
--V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0 ;;
--x) 
-	echo "LU: $LU" 
-	echo "LH: $LH"
-	echo "LD: $LD"
-	echo "LPATH: $LPATH"
-	echo
-	echo "XH: $XH"
-	echo "XW: $XW"
-	echo "XT: $XT"
-	echo "HH: $HH"
-	exit 0 ;;
+-V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0;;
+-x) echo "HH: $HH";exit 0;;
 -R) hR "$2";shift $?;;
 -M0) am="";;
 -MX) am+=" -O exit";;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;
 -*) a+=" $1";;
- *) [[ -z $h ]]&&h=${1%%[/:]}||{ r="${*};exit"; break;} ;;
+ *) [[ -z $h ]]&&h=${1%%[/:]}||{ r="${*};exit"; break;};;
 esac;shift;done
 [[ $h ]]&&h=$(hH $h)||{ ssh $a$am;exit $?;}
 return 0;}
