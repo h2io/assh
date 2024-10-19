@@ -94,6 +94,11 @@ ASSH behaves just like SSH but with added convenience and functionality:
   You can keep using your ASSH config even after you `sudo su`.  
   Just use `,su` and all the configurations and scripts are available to you.  
 
+- **ssh config templates**  
+  `.config.tpl` is a template that includes `.ssh/config` and then allows you  
+  to customize the values you might need expanding the environment variables.  
+  The expanded template is saved to `.config` and used by the assh command.
+
 - **No login messages**  
   By default, you get no motd messages. This behavior is controlled by the  
   `.hushlogin` and `.hushassh` files. Removing these files will show you the  
