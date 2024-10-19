@@ -15,7 +15,9 @@ sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
 printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
 rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
-#echo "h:$h";echo "a:$a$am";echo "r:$r"
+[[ -f "$HH/.config.tpl" && -n "$XUSER" ]] && envsubst < "$HH/.config.tpl" > "$HH/.config"
+[[ -f "$HH/.config" ]] && am+=" -F $HH/.config"
+#echo "h:$h";echo "a-am:$a$am";echo "r:$r"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
 [ ! -f "$XW/.asshrc" ] && echo "[assh] missing file: $XW/.asshrc" >&2 && exit 1
 te="--exclude={.git,LICENSE,README*}";tx=$(eval echo $te)
@@ -60,6 +62,7 @@ case $1 in
 	echo "XH: $XH"
 	echo "XW: $XW"
 	echo "XT: $XT"
+	echo "HH: $HH"
 	exit 0 ;;
 -R) hR "$2";shift $?;;
 -M0) am="";;
