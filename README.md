@@ -111,19 +111,29 @@ ASSH behaves just like SSH but with added convenience and functionality:
   the server's status and to also get a unified message that you can customize  
   as you see fit.  
 
-- **Endless customizations**  
-  You can customize the .sshrc for generic usage, add custom functionality for  
-  each server you log in to, or for groups of servers.  
+- **Endless Customizations**
 
-  `~/.assh.d` is just the main directory... all `~/.assh*` directories get loaded  
-  in alphabetical order and combined on the server you assh into. This way you  
-  can have group settings but can also customize your own, overwriting with  
-  custom functionality while also keeping  
+You can customize the `.sshrc` for generic usage, add custom functionality  
+for each server you log in to, or for groups of servers.  
 
-- **100% compatibility, 100% code is bash**  
-  All code is bash so it can execute without problems on any server. Other  
-  dependencies are widely available: openssl, cut, cat, tr, sed, ...  
-  Because the code is bash you can review it and be sure it does what it says.  
+`~/.assh.d` is just the main directory... all `~/.assh*` directories get  
+loaded in alphabetical order and combined on the server you `assh` into. This  
+way, you can have group settings while also allowing for customization by  
+overwriting with custom functionality. This structure helps you maintain  
+group settings while keeping the flexibility to personalize your own,  
+ensuring that group configurations are still respected, but individual  
+preferences take precedence.  
+
+**100% Compatibility, 100% Code is Bash**
+
+All code is Bash, so it can execute without problems on any Linux server. Here  
+is the list of external dependencies: `bash`, `cat`, `eval`, `echo`, `find`,  
+`wc`, `kill`, `mktemp`, `printf`, `command`, `trap`, `read`, `unset`, `awk`,  
+`shuf`, OpenSSL, SSH, `tar`, `rsync`, `envsubst`. These are core external tools  
+and utilities widely present on Linux servers.  
+
+The code is not easy to understand completely, even if it’s only ~50 lines of  
+Bash, but it's not that difficult to review and ensure it does what it says.  
 
 - **Extensibility**  
   These usage examples are just simplified use cases but there's a lot more  
