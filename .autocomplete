@@ -4,9 +4,17 @@ ac_()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    #opts=$(grep -E '^Host ' $HH/.config.tpl | grep -v 'Host \*' | awk '{$1=""; print}' | tr -d '*' | sed -E 's/\[([0-9.]+)\]/{\1}/g' | xargs -n1 | while read -r line; do eval echo $line; done | tr ' ' '\n' | sort -u)
-    opts=$(grep -E '^Host ' $HH/.config.tpl | grep -v 'Host \*' | awk '{$1=""; print}' | awk '{for(i=1;i<=NF;i++) if($i !~ /\*/) printf "%s ", $i; print ""}' | sed -E 's/\[([0-9.]+)\]/{\1}/g' | xargs -n1 | while read -r line; do eval echo $line; done | tr ' ' '\n' | sort -u)
-
+    if [[ -f "$HH/.config.tpl" ]]; then
+        opts=$(grep -E '^Host ' $HH/.config.tpl 2>/dev/null \
+        | grep -v 'Host \*' \
+        | awk '{$1=""; print}' \
+        | awk '{for(i=1;i<=NF;i++) if($i !~ /[\*\?]/) printf "%s ", $i; print ""}' \
+        | sed -E 's/\[([0-9.]+)\]/{\1}/g' \
+        | xargs -n1 \
+        | sort -u)
+    else
+        opts=""
+    fi
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
     return 0
 }
