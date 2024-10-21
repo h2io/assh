@@ -12,7 +12,7 @@ elif [[ -n "$LH" ]]; then
     opt="LH=${H_}"
 fi
 
-sudo -E su - "${1:-root}" -c "ASSHRC='' $opt LCHAIN=${LCHAIN} bash --rcfile \"${H_}/.bashrc\""
+sudo -E su - "${1:-root}" -c "ASSHRC='' $opt LCHAIN=${LCHAIN} XORIGIN=${XORIGIN} bash --rcfile \"${H_}/.bashrc\""
 
 #sudo -E su - ${1:-root} -c "ASSHRC='' LH=${LH} LCHAIN=${LCHAIN} bash --rcfile \"${H_}/.bashrc\""
 #sudo -E -u "${1:-root}" bash -c "ASSHRC='' LH='$LH' bash --rcfile \"${H_}/.bashrc\""
