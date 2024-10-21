@@ -35,6 +35,7 @@ z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 
 trap shc 0
 o="openssl base64"; od="openssl base64 -d"
 	read -r -d '' s <<EOB
+export XORIGIN="$h"
 export XUSER="$XUSER";export XDEBUG="$XDEBUG"
 export RC="$rc";export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)

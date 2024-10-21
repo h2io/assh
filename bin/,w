@@ -1,0 +1,30 @@
+#!/bin/bash
+# Script to display logged-in user and session information
+
+# Include color definitions
+. ${XH:=$LH}/lib/colors
+
+# Function to get the current user
+get_current_user() {
+    echo "$USER"
+}
+
+# Function to get all active sessions
+get_active_sessions() {
+    who
+}
+
+# Display current user
+current_user=$(get_current_user)
+echo -e "${CG}Current User:${RS} ${CW}$current_user${RS}"
+
+# Display active sessions
+echo -e "\n${CB}Active Sessions:${RS}"
+echo -e "${CL}USER            TTY      FROM             LOGIN@${RS}"
+get_active_sessions | while read -r user tty from rest; do
+    printf "${CW}%-15s %-8s %-16s %s${RS}\n" "$user" "$tty" "$from" "$rest"
+done
+
+# Display total number of active sessions
+session_count=$(get_active_sessions | wc -l)
+echo -e "\n${CG}Total Active Sessions:${RS} ${CW}$session_count${RS}"

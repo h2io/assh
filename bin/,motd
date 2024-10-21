@@ -122,7 +122,7 @@ get_docker_info() {
 }
 
 # Display system information
-echo -e "${CC}Welcome to $(hostname)${RS}\t${CD}[$XV]${CN}"
+echo -e "${CC}Welcome to $XORIGIN / $(hostname)${RS}\n${CD}[$XV]${CN}"
 echo -e "${CD}--------------------------------${RS}"
 printf "${CG}%-20s${RS} %s\n" "Date and Time:" "$(date)"
 printf "${CG}%-20s${RS} %s\n" "Uptime:" "$(uptime -p)"
@@ -135,34 +135,9 @@ echo -e "${CD}--------------------------------${RS}"
 get_docker_info
 echo -e "${CD}--------------------------------${RS}"
 
-# Display last login information with improved formatting
-echo -e "${CL}USERNAME         TTY      FROM             LOGIN TIME${RS}"
-last -a -n 5 | grep -v "reboot" | while read -r user tty from rest; do
-    printf "${CW}%-16s %-8s %-17s %s${RS}\n" "$user" "$tty" "$from" "$rest"
-done
-
-echo -e "\n${CG}Current Sessions:${RS}"
-who | while read -r user tty logintime ip; do
-    printf "${CW}%-16s %-8s %-17s %s${RS}\n" "$user" "$tty" "$ip" "$logintime"
-done
-
-echo -e "${CD}--------------------------------${RS}"
-
 # Call the virtualization detection function
 detect_virtualization
 echo -e "${CD}--------------------------------${RS}"
-
-# Display important system messages or alerts (if any)
-if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-    # User has sudo privileges and can use them without a password
-    echo -e "${CR}Recent System Alerts:${RS}"
-    sudo grep -i -E 'error|warning|critical' /var/log/syslog | tail -n 5
-    echo -e "${CD}--------------------------------${RS}"
-else
-    # User doesn't have sudo privileges or requires a password
-    echo -e "${CY}Note: Unable to check system alerts (requires sudo privileges)${RS}"
-    echo -e "${CD}--------------------------------${RS}"
-fi
 
 # Display available updates (if any)
 if command -v apt &>/dev/null; then
