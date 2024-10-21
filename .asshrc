@@ -4,6 +4,8 @@
 [ "$ASSHRC" ] && return || export ASSHRC=true
 export HH=${XH:-$LH}
 
+. $HH/.autocomplete
+
 xv_() {
   sd="$(dirname "${BASH_SOURCE[0]}")"
   xv=$(cat "${sd}/VERSION")
@@ -26,7 +28,7 @@ p+ () {
 }
 
 # HELP: uses assh by default instead of ssh (use \ssh if you want the plain ssh)
-alias ssh='assh'
+#alias ssh='assh'
 
 # HELP: history | grep 
 alias ,hg='history|grep'
@@ -42,10 +44,12 @@ alias ,h0='unset HISTFILE && history -c && history -r ~/.bash_history'
 
 if [ "$XH" ]; then
 	# executed via assh login
+	if [ "$RC" != "-" ]; then
 	[ -r /etc/profile ] && . /etc/profile
 	[ -r ~/.bash_profile ] && . ~/.bash_profile ||
 	[ -r ~/.bash_login ] && . ~/.bash_login ||
 	[ -r ~/.profile ] && . ~/.profile
+	fi
 
 	export XPATH=$XH:$XH/bin
 	XL=$XH/lib			# prepare XH libray path to load

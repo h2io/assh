@@ -2,7 +2,7 @@
 XT=$(eval echo "${XH:-$LU/.assh*}")
 XW=$(eval echo "${XH:=$LU/.assh.d}")
 a="" am=" -o ControlMaster=auto -o ControlPath=~/.ssh/.assh-%r@%h:%p -o ControlPersist=yes"
-h="" r="" sp=""
+h="" r="" sp="" rc=""
 shc () {
 [[ "$sf" == /tmp/* ]] && rm "$sf"
 [[ "$sd" == /tmp/* ]] && { rmdir "$sd" 2>/dev/null || echo "[assh] $sd contains data"; } || :
@@ -15,12 +15,19 @@ sf=$(mktemp /tmp/assh-XXXXXXXXXX);sd=$(mktemp -d /tmp/assh-XXXXXXXXXX)
 printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n" "$XP" "$sd" > "$sf"
 rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
-[[ -f "$HH/.config.tpl" && -n "$XUSER" ]] && envsubst < "$HH/.config.tpl" > "$HH/.config"
-[[ -f "$HH/.config" ]] && am+=" -F $HH/.config"
 #echo "h:$h";echo "a-am:$a$am";echo "r:$r"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
+te="--exclude={.git,LICENSE,README*}";
 [ ! -f "$XW/.asshrc" ] && echo "[assh] missing file: $XW/.asshrc" >&2 && exit 1
-te="--exclude={.git,LICENSE,README*}";tx=$(eval echo $te)
+if [[ -f "$HH/.config.tpl" && -n "$XUSER" ]]; then
+	envsubst < "$HH/.config.tpl" > "$HH/.config"
+	[[ -f "$HH/.config" ]] && am+=" -F $HH/.config"
+	if [[ -n "$XDEBUG" ]]; then
+		xwho=$(ssh "$h" $a$am "whoami")
+		[[ "$xwho" == "$XDEBUG" ]] && te+=" --exclude=.config*"
+	fi
+fi
+tx=$(eval echo $te)
 tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
 	#echo "te: $te";echo "tp: $tp"
 	#echo $(tar $tp|tar -tzf -)
@@ -28,7 +35,8 @@ z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 
 trap shc 0
 o="openssl base64"; od="openssl base64 -d"
 	read -r -d '' s <<EOB
-export XV="$XV";export XZ=$z
+export XUSER="$XUSER";export XDEBUG="$XDEBUG"
+export RC="$rc";export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
 ${XP:+export XP=$XP}
 echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
@@ -55,6 +63,7 @@ case $1 in
 -V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0;;
 -x) echo "HH: $HH";exit 0;;
 -R) hR "$2";shift $?;;
+-NORC) rc="-";;
 -M0) am="";;
 -MX) am+=" -O exit";;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;

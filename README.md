@@ -97,7 +97,10 @@ ASSH behaves just like SSH but with added convenience and functionality:
 - **ssh config templates**  
   `.config.tpl` is a template that includes `.ssh/config` and then allows you  
   to customize the values you might need expanding the environment variables.  
-  The expanded template is saved to `.config` and used by the assh command.
+  The expanded template is saved to `.config` and used by the assh command.  
+
+  The config will not propagate on servers where the user you connect as is 
+  equal to `$XDEBUG` as defined in your environment (precursor to multi-tenant).
 
 - **No login messages**  
   By default, you get no motd messages. This behavior is controlled by the  
@@ -129,7 +132,7 @@ preferences take precedence.
 All code is Bash, so it can execute without problems on any Linux server. Here  
 is the list of external dependencies: `bash`, `cat`, `eval`, `echo`, `find`,  
 `wc`, `kill`, `mktemp`, `printf`, `command`, `trap`, `read`, `unset`, `awk`,  
-`shuf`, OpenSSL, SSH, `tar`, `rsync`, `envsubst`. These are core external tools  
+`shuf`, `openssl`, `ssh`, `tar`, `rsync`, `envsubst`. These are core external tools  
 and utilities widely present on Linux servers.  
 
 The code is not easy to understand completely, even if it’s only ~50 lines of  
