@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 XT=$(eval echo "${XH:-$LU/.assh*}")
+#XT="$XT $HH/.config-${LC_XSILO}.tpl"
+#echo "XT:$XT"
 XW=$(eval echo "${XH:=$LU/.assh.d}")
 a="" am=" -o ControlMaster=auto -o ControlPath=~/.ssh/.assh-%r@%h:%p -o ControlPersist=yes"
 h="" r="" sp="" rc=""
@@ -16,24 +18,27 @@ printf "port=%s\n[assh]\npath=%s\nread only=false\nlist=yes\nuse chroot=false\n"
 rsync --daemon --no-detach --config="$sf" & sp=$!;}
 assh() {
 #echo "h:$h";echo "a-am:$a$am";echo "r:$r"
+o="openssl base64"; od="openssl base64 -d"
 command -v openssl >/dev/null 2>&1 || { echo >&2 "[assh] missing openssl. aborting.";return 1;}
-te="--exclude={.git,LICENSE,README*}";
 [ ! -f "$XW/.asshrc" ] && echo "[assh] missing file: $XW/.asshrc" >&2 && exit 1
-if [[ -f "$HH/.config.tpl" && -n "$XUSER" ]]; then
-	envsubst < "$HH/.config.tpl" > "$HH/.config"
-	[[ -f "$HH/.config" ]] && am+=" -F $HH/.config"
-	if [[ -n "$XDEBUG" ]]; then
-		xwho=$(ssh "$h" $a$am "whoami")
-		[[ "$xwho" == "$XDEBUG" ]] && te+=" --exclude=.config*"
+	if [[ -f "$HH/.config-${LC_XSILO}.tpl" && -n "$XUSER" ]]; then
+envsubst < "$HH/.config-${LC_XSILO}.tpl" > "$HH/.config"
+[[ -f "$HH/.config" ]] && am+=" -F $HH/.config"
+xw=$(ssh "$h" $a$am "echo \$LC_XSILO"|tr -d '\0')
+xwf=".config-${xw}.tpl"
+#echo "xwf:$xwf"
+[[ -f "$HH/${xwf}" ]] && xwt=$(cat << EOF
+echo $'$(cat $HH/${xwf} | $o)' | $od > \$XH/${xwf}
+EOF
+)
 	fi
-fi
+te="--exclude={.git,LICENSE,README*,.config*}";
 tx=$(eval echo $te)
 tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
 	#echo "te: $te";echo "tp: $tp"
 	#echo $(tar $tp|tar -tzf -)
 z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
 trap shc 0
-o="openssl base64"; od="openssl base64 -d"
 [[ "$motd" != "-" ]] && motd=$(cat << EOF
 [ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
 [ -z "$r" ] && [ ! -e \$XH/.hushassh ] && \$XH/bin/,motd
@@ -47,12 +52,13 @@ export RC="$rc";export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
 ${XP:+export XP=$XP}
 echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
+${xwt}
 ${motd}
 unset XK XI
 bash -c $'trap "[[ \$XH == /tmp/ssh+* ]] && rm -rf \$XH;" EXIT; bash --rcfile \$XH/.asshrc'
 EOB
-#echo "s:$s"
-ssh -t "$h" $a$am "$s";}
+	#echo "s:$s"
+	ssh -t "$h" $a$am "$s";}
 hR() {
 if [[ -z $1 || $1 == -* || ! $1 =~ ^[0-9]+:[^:]+:[0-9]+$ ]]; then
 XP=${XP:-$(shuf -i 50000-65000 -n 1)}

@@ -90,7 +90,7 @@ get_ip_address() {
 check_sudo_privileges() {
     if command -v sudo >/dev/null 2>&1; then
         if sudo -n true 2>/dev/null; then
-            echo -e "${CYb}Yes${RS}"
+            echo -e "${CY}Yes${RS}"
         else
             echo -e "${CY}Limited/No${RS}"
         fi
@@ -124,6 +124,7 @@ get_docker_info() {
 # Display system information
 echo -e "${CC}Welcome to $XORIGIN / $(hostname)${RS}\n${CD}[$XV]${CN}"
 echo -e "${CD}--------------------------------${RS}"
+printf "${CG}%-20s${RS} %b\n" "Data Silo:" "${CY}${LC_XSILO}${RS}"
 printf "${CG}%-20s${RS} %s\n" "Date and Time:" "$(date)"
 printf "${CG}%-20s${RS} %s\n" "Uptime:" "$(uptime -p)"
 printf "${CG}%-20s${RS} %s\n" "System Load:" "$(uptime | awk -F'load average: ' '{ print $2 }')"

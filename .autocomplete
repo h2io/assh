@@ -4,8 +4,8 @@ ac_()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    if [[ -f "$HH/.config.tpl" ]]; then
-        opts=$(grep -E '^Host ' $HH/.config.tpl 2>/dev/null \
+    if [[ -f "$HH/.config-${LC_XSILO}.tpl" ]]; then
+        opts=$(grep -E '^Host ' $HH/.config-${LC_XSILO}.tpl 2>/dev/null \
         | grep -v 'Host \*' \
         | awk '{$1=""; print}' \
         | awk '{for(i=1;i<=NF;i++) if($i !~ /[\*\?]/) printf "%s ", $i; print ""}' \
