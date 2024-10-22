@@ -34,6 +34,12 @@ tp="$tx -czhf - $(for dir in $XT; do printf '%s ' '-C' "$dir" '.'; done)"
 z=$(tar $tp|wc -c) && [ $z -gt 65536 ] && echo $'[assh] size ('$z') > 64kb' >&2 && exit 1
 trap shc 0
 o="openssl base64"; od="openssl base64 -d"
+[[ "$motd" != "-" ]] && motd=$(cat << EOF
+[ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
+[ -z "$r" ] && [ ! -e \$XH/.hushassh ] && \$XH/bin/,motd
+echo "$r" >> \$XH/.asshrc
+EOF
+) || motd=""
 	read -r -d '' s <<EOB
 export XORIGIN=$(echo "$h" | awk -F@ '{print (NF>1 ? $NF : $0)}')
 export XUSER="$XUSER";export XDEBUG="$XDEBUG"
@@ -41,9 +47,7 @@ export RC="$rc";export XV="$XV";export XZ=$z
 export XH=\$(mktemp -d /tmp/ssh+XXXXXXXXXX)
 ${XP:+export XP=$XP}
 echo $'$(tar $tp | $o)' | $od | tar -mxzf - -C \$XH
-[ -z "$r" ] && [ ! -e \$XH/.hushlogin ] && \$XH/bin/,motd.orig
-[ -z "$r" ] && [ ! -e \$XH/.hushassh ] && \$XH/bin/,motd
-echo "$r" >> \$XH/.asshrc
+${motd}
 unset XK XI
 bash -c $'trap "[[ \$XH == /tmp/ssh+* ]] && rm -rf \$XH;" EXIT; bash --rcfile \$XH/.asshrc'
 EOB
@@ -62,9 +66,10 @@ arg() {
 while [[ $# -gt 0 ]]; do
 case $1 in
 -V) echo -e "$XV\n$(ssh -V 2>&1)"; exit 0;;
--x) echo "HH: $HH";exit 0;;
+-DEBUG) echo "HH: $HH";exit 0;;
 -R) hR "$2";shift $?;;
 -NORC) rc="-";;
+-NOMOTD) motd="-";;
 -M0) am="";;
 -MX) am+=" -O exit";;
 -[BbcDEeFIiJLlmOopQRSWw]) a+=" $1 $2";shift;;

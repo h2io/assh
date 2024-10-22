@@ -29,6 +29,7 @@ p+ () {
 
 # HELP: uses assh by default instead of ssh (use \ssh if you want the plain ssh)
 #alias ssh='assh'
+#alias assh='assh -NOMOTD'
 
 # HELP: history | grep 
 alias ,hg='history|grep'
