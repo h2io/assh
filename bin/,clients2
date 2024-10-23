@@ -1,0 +1,4 @@
+#!/bin/bash
+# HELP: list r03 clients (via curl)
+
+curl http://10.10.2.11:18081/
