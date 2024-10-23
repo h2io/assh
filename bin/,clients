@@ -1,4 +1,4 @@
 #!/bin/bash
-# HELP: list r03 clients
+# HELP: list r03 clients (via assh+sudo)
 
 assh r03 'sudo su - -c /root/show-clients'
